@@ -14,8 +14,8 @@ stream:
 
 - **PFE (Point Feature Enhancement) module** — uses the point mask and the
   measured values as a two-channel condition to drive *zero-initialized*
-  gated convolutions at **nine** decoder positions. Adds only **+0.139%**
-  parameters (18.4k on a 13.28M backbone) and starts as an exact identity
+  gated convolutions at **nine** decoder positions. Adds only **18.4k**
+  parameters (**0.138%** of the 13.29 M total) and starts as an exact identity
   mapping, so training always improves on the baseline.
 - **Point-aware loss** — point weighting (with hard-example up-weighting)
   + a spatial gradient constraint on the whole-map reconstruction.
@@ -23,7 +23,17 @@ stream:
   briefly fine-tunes the whole network for 20 epochs.
 
 <p align="center">
-  <img src="assets/architecture.png" alt="PACE-Net architecture" width="820"/>
+  <img src="assets/architecture.png" alt="PACE-Net architecture" width="460"/>
+</p>
+<p align="center">
+  <em>Fig. 1 — Overall PACE-Net architecture: a two-level cascade with the PFE module at nine skip-concat positions of the refinement decoder (6-level encoder-decoder, 256×256 → 4×4).</em>
+</p>
+
+<p align="center">
+  <img src="assets/pfe_module.png" alt="PFE module" width="400"/>
+</p>
+<p align="center">
+  <em>Fig. 2 — PFE module: the two-channel condition [point mask, measurement/256] drives a zero-initialized 3×3 gated convolution; the decoder feature is modulated by (1 + α·W_gate⊙M), leaving non-measured pixels unchanged.</em>
 </p>
 
 ## Results
@@ -40,10 +50,17 @@ held-out RMSE and NMSE:
 | **PACE-Net (ours)** | **0.0126** | **0.0318** | **0.0316** | **0.0183** |
 
 Relative to RadioUNet: global RMSE **−19.8%**, NMSE **−36.0%**,
-measurement-point RMSE **−53.5%**, with a negligible **+0.139%** model-size
+measurement-point RMSE **−53.5%**, with a negligible **0.138%** model-size
 increase. On a real campus with at most 300 field measurements, the
 predictions reach **0.901 correlation** and **3.42 dBm** RMSE at the
 measurement points (within the 5 dBm engineering margin).
+
+<p align="center">
+  <img src="assets/training_curves.png" alt="Training convergence" width="640"/>
+</p>
+<p align="center">
+  <em>Fig. 3 — Validation RMSE convergence: PACE-Net against five representative baselines under the identical training protocol.</em>
+</p>
 
 ## Repository layout
 
@@ -58,7 +75,7 @@ PACE-Net/
 ├── evaluate.py          # Verify the trained model on the test split
 ├── requirements.txt
 ├── LICENSE              # CC BY-NC 4.0
-└── assets/              # Architecture figure used in this README
+└── assets/              # Figures used in this README (architecture, PFE module, training curves)
 ```
 
 No pre-trained checkpoints are distributed; `train.py` writes the trained
@@ -67,7 +84,7 @@ weights to `weights/` (created automatically).
 ## 1. Setup
 
 ```bash
-git clone https://github.com/xcljn/PACE-Net.git
+git clone https://github.com/fengli0610/PACE-Net.git
 cd PACE-Net
 pip install -r requirements.txt
 ```
